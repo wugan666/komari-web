@@ -623,8 +623,8 @@ function MetricRetentionTable({
     const canonicalDrafts: Record<string, string> = {};
     for (const metric of metrics) {
       const value = drafts[metric.name] ?? String(metric.retention_days);
-      const days = parseInt(value, 10);
-      if (isNaN(days) || days < 0) {
+      const days = Number(value);
+      if (!value.trim() || !Number.isInteger(days) || days < -1) {
         toast.error(t("settings.metrics.retention_invalid"));
         return;
       }
@@ -642,8 +642,8 @@ function MetricRetentionTable({
       toast.error(t("settings.metrics.batch_select_required"));
       return;
     }
-    const days = parseInt(batchRetentionDays, 10);
-    if (isNaN(days) || days < 0) {
+    const days = Number(batchRetentionDays);
+    if (!batchRetentionDays.trim() || !Number.isInteger(days) || days < -1) {
       toast.error(t("settings.metrics.retention_invalid"));
       return;
     }
@@ -732,7 +732,7 @@ function MetricRetentionTable({
                   </Text>
                   <TextField.Root
                     type="number"
-                    min="0"
+                    min="-1"
                     value={batchRetentionDays}
                     onChange={(event) => setBatchRetentionDays(event.target.value)}
                   />
@@ -835,7 +835,7 @@ function MetricRetentionTable({
                       <TableCell>
                         <TextField.Root
                           type="number"
-                          min="0"
+                          min="-1"
                           value={drafts[metric.name] ?? ""}
                           disabled={saving}
                           onChange={(event) =>
