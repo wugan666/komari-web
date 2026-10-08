@@ -21,7 +21,7 @@ permissions:
 
 jobs:
   build:
-    if: github.repository == 'R1ddle1337/komari-web'
+    if: github.repository == 'wugan666/komari-web'
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
@@ -57,7 +57,7 @@ jobs:
             komari-theme.zip.sha256
 
   publish:
-    if: github.repository == 'R1ddle1337/komari-web' && github.ref == 'refs/heads/owned' && github.event_name == 'workflow_dispatch' && inputs.publish
+    if: github.repository == 'wugan666/komari-web' && github.ref == 'refs/heads/owned' && github.event_name == 'workflow_dispatch' && inputs.publish
     needs: build
     runs-on: ubuntu-24.04
     timeout-minutes: 5
@@ -74,7 +74,7 @@ jobs:
         run: |
           set -euo pipefail
           [[ "$VERSION" =~ ^v?(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$ ]]
-          current_owned="$(gh api repos/R1ddle1337/komari-web/git/ref/heads/owned --jq .object.sha)"
+          current_owned="$(gh api repos/wugan666/komari-web/git/ref/heads/owned --jq .object.sha)"
           test "$current_owned" = "$GITHUB_SHA"
           if gh release view "$VERSION" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             echo "The release already exists; refusing to overwrite it." >&2

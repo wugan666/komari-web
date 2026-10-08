@@ -6,7 +6,7 @@
 保留上游作者和许可信息，业务功能及其删除均跟随该开发分支；
 自管安装与更新来源、受控构建发布的改动继续保留。
 
-运行版本由 `R1ddle1337/komari` 主控仓库选择本仓库的完整提交 SHA，执行
+运行版本由 `wugan666/komari` 主控仓库选择本仓库的完整提交 SHA，执行
 `npm ci`、`npm run build` 后嵌入主控；不能使用浮动上游前端或下载其预编译 UI。
 Node.js 固定为 `22.23.2`，沿用现有 `package-lock.json`，不自动升级依赖。
 
@@ -15,11 +15,11 @@ Node.js 固定为 `22.23.2`，沿用现有 `package-lock.json`，不自动升级
 所有节点安装入口（普通节点、自动发现、旧节点表格）统一使用
 `src/utils/ownedSources.ts`：
 
-- 安装脚本来自 `R1ddle1337/komari-agent` 的 `1.5.18` tag。
+- 安装脚本来自 `wugan666/komari-agent` 的 `1.5.18` tag。
 - 默认初次安装传入 `--install-version 1.5.18`，Agent 仍可从其自管仓库自动更新。
 - 保留最新 UI 的指定版本与 snapshot 选项；显式选择的版本仍只从自管 Agent 仓库下载。
-- Docker 使用 `ghcr.io/r1ddle1337/komari-agent:1.5.18`。
-- 主控版本提醒仅查询 `R1ddle1337/komari` 的 releases。
+- Docker 使用 `ghcr.io/wugan666/komari-agent:1.5.18`。
+- 主控版本提醒仅查询 `wugan666/komari` 的 releases。
 - 远控、终端、文件管理、自更新和上游现有安装选项均保留。
 
 本次包含上游的新手引导、独立登录页和可配置仪表盘；也接受上游删除的
