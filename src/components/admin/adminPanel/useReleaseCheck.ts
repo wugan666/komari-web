@@ -1,3 +1,4 @@
+import { OWNED_SERVER_RELEASES_URL } from "@/utils/ownedSources";
 import { useEffect, useState } from "react";
 import { useRPC2Call } from "@/contexts/RPC2Context";
 import type { GithubReleaseInfo } from "./types";
@@ -47,7 +48,7 @@ export function useReleaseCheck(publicInfo: unknown) {
     async function loadReleases() {
       try {
         const resp = await fetch(
-          "https://api.github.com/repos/komari-monitor/komari/releases?per_page=100",
+          OWNED_SERVER_RELEASES_URL,
           {
             headers: {
               Accept: "application/vnd.github+json",

@@ -9,6 +9,7 @@ import webDependencies from "@/utils/openSource.web.json";
 import goDependencies from "@/utils/openSource.go.json";
 import { SettingCardCollapse } from "@/components/admin/SettingCard";
 import PageHeader from "@/components/PageHeader";
+import { OWNED_SERVER_README_PAGE } from "@/utils/ownedSources";
 import { useRouteQuery } from "@/lib/routeData";
 import { aboutReadmeQuery } from "@/routeQueries/system";
 
@@ -176,7 +177,7 @@ export default function AboutPage() {
                   </Skeletonize>
                 </AutoHeight>
                 <a
-                  href="https://github.com/komari-monitor/komari/blob/main/README.md"
+                  href={OWNED_SERVER_README_PAGE}
                   target="_blank"
                   rel="noreferrer"
                   className="flex flex-row gap-2 text-sm items-center"

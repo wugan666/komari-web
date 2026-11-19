@@ -1,3 +1,4 @@
+import { OWNED_AGENT_REPOSITORY, OWNED_AGENT_VERSION } from "@/utils/ownedSources";
 import { quotePowerShellArg, quoteShellArg, quoteShellArgs } from "@/utils/shellQuote";
 import { toast } from "sonner";
 import type { InstallOptionsState } from "./useInstallOptions";
@@ -116,7 +117,12 @@ export function buildInstallCommand(
   if (selectedPlatform === "windows") {
     scriptFile = "install.ps1";
   }
-  let scriptUrl = `https://raw.githubusercontent.com/komari-monitor/komari-agent/refs/heads/main/${scriptFile}`;
+  // Pin the installer script and initial binary to the same owned release;
+  // later self-updates are decided by the owned agent itself.
+  if (!args.includes("--install-version")) {
+    args.push("--install-version", OWNED_AGENT_VERSION);
+  }
+  let scriptUrl = `https://raw.githubusercontent.com/${OWNED_AGENT_REPOSITORY}/refs/tags/${OWNED_AGENT_VERSION}/${scriptFile}`;
   if (enableGhproxy && ghproxy) {
     scriptUrl = scriptUrl.slice(8); // 去掉 https://
     if (ghproxy.endsWith("/")) {
@@ -175,10 +181,10 @@ export function buildInstallCommand(
         ? `touch .komari-auto-discovery.json && ` +
           `docker run -d --name komari-agent --restart=always ` +
           `-v .komari-auto-discovery.json:/app/auto-discovery.json ` +
-          `ghcr.io/komari-monitor/komari-agent:latest ` +
+          `ghcr.io/${OWNED_AGENT_REPOSITORY}:${OWNED_AGENT_VERSION} ` +
           quoteShellArgs(dockerArgs)
         : `docker run -d --name komari-agent --restart=always ` +
-          `ghcr.io/komari-monitor/komari-agent:latest ` +
+          `ghcr.io/${OWNED_AGENT_REPOSITORY}:${OWNED_AGENT_VERSION} ` +
           quoteShellArgs(dockerArgs);
       break;
     }

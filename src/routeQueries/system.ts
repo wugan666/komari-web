@@ -1,3 +1,4 @@
+import { OWNED_SERVER_README_URL } from "@/utils/ownedSources";
 // 页面数据预取登记：exec / pprof / 关于（写法见 ./admin.ts 与 @/lib/routeData）
 import { api } from "@/lib/http";
 import { prefetchRouteQuery, routeQuery, type RouteQuery } from "@/lib/routeData";
@@ -104,7 +105,7 @@ registerRouteData("/admin/pprof", () => prefetchRouteQuery(pprofSummaryQuery));
 
 export const aboutReadmeQuery = routeQuery("system/about/readme", async () => {
   const res = await fetch(
-    "https://raw.githubusercontent.com/komari-monitor/komari/refs/heads/main/README.md",
+    OWNED_SERVER_README_URL,
   );
   if (!res.ok) throw new Error(String(res.status));
   return res.text();
