@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import React, { useMemo } from "react";
-import { Text } from "@radix-ui/themes";
+import { Callout, Text } from "@radix-ui/themes";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import Loading from "@/components/loading";
@@ -41,6 +41,11 @@ const NotificationSettings = () => {
   const [channelLoading, setChannelLoading] = React.useState(false);
   const [saving, setSaving] = React.useState(false);
   const [channelError, setChannelError] = React.useState("");
+  const [enabled, setEnabled] = React.useState(false);
+
+  React.useEffect(() => {
+    if (!loading) setEnabled(Boolean(settings.notification_enabled));
+  }, [loading, settings.notification_enabled]);
 
   const currentLanguage =
     i18n.resolvedLanguage || i18n.language || navigator.language;
@@ -156,6 +161,48 @@ const NotificationSettings = () => {
   return (
     <>
       <SettingCardLabel>{t("settings.notification.title")}</SettingCardLabel>
+      <Callout.Root color="blue" className="km-notification-plugin-hint">
+        <Callout.Text>
+          {t(
+            "settings.notification.plugin_channels_hint",
+            "Telegram, Email, Bark, Gotify and ServerChan channels are provided by plugins. Install and enable one, then pick it under Delivery Method; its settings appear below once selected. Webhook and JavaScript are built in.",
+          )}
+          <Link to="/admin/market/plugins?q=notification" className="ml-2 underline">
+            {t("settings.notification.open_plugin_market", "Open plugin market")}
+          </Link>
+          <Link to="/admin/plugins" className="ml-2 underline">
+            {t("settings.notification.manage_plugins")}
+          </Link>
+        </Callout.Text>
+      </Callout.Root>
+      {enabled && (!currentChannel || currentChannel === "none") ? (
+        <Callout.Root color="amber">
+          <Callout.Text>
+            {t(
+              "settings.notification.no_channel_selected",
+              "Notifications are enabled but no delivery channel is selected, so nothing will be sent.",
+            )}
+          </Callout.Text>
+        </Callout.Root>
+      ) : null}
+      {currentChannel && !currentRegistered && currentChannel !== "none" ? (
+        <Callout.Root color="red">
+          <Callout.Text>
+            {t("settings.notification.channel_unavailable_named", {
+              channel: currentChannel,
+              defaultValue:
+                "The selected channel \"{{channel}}\" is not registered, so notifications are not being sent.",
+            })}{" "}
+            {t("settings.notification.plugin_required_help")}
+            <Link to={`/admin/market/plugins?q=${encodeURIComponent(currentChannel)}`} className="ml-2 underline">
+              {t("settings.notification.open_plugin_market", "Open plugin market")}
+            </Link>
+            <Link to="/admin/plugins" className="ml-2 underline">
+              {t("settings.notification.manage_plugins")}
+            </Link>
+          </Callout.Text>
+        </Callout.Root>
+      ) : null}
       <SettingCardSwitch
         title={t("settings.notification.enable")}
         description={t("settings.notification.enable_description")}
@@ -165,6 +212,7 @@ const NotificationSettings = () => {
             { notification_enabled: checked },
             t,
           );
+          setEnabled(checked);
         }}
         className="km-page-admin-settings-notification km-setting-card"
       />
@@ -193,15 +241,6 @@ const NotificationSettings = () => {
           setCurrentChannel(value);
         }}
       />
-      {currentChannel && !currentRegistered && currentChannel !== "none" ? (
-        <Text color="gray">
-          {t(
-            "settings.notification.channel_unavailable",
-            "This notification channel is not currently registered.",
-          )} {t("settings.notification.plugin_required_help")}
-          <Link to="/admin/plugins" className="ml-2 underline">{t("settings.notification.manage_plugins")}</Link>
-        </Text>
-      ) : null}
       {currentRegistered && items.length > 0 ? (
         <ConfigFormTabs
           items={items}

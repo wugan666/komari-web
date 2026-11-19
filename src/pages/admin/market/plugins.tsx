@@ -28,7 +28,7 @@ import {
   Trash2,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
 import Loading from "@/components/loading";
 import { useRPC2Call } from "@/contexts/RPC2Context";
@@ -183,7 +183,8 @@ export default function PluginMarketPage() {
   const [installedInfo, setInstalledInfo] = useState<Map<string, PluginInfo>>(
     new Map(),
   );
-  const [search, setSearch] = useState("");
+  const [searchParams] = useSearchParams();
+  const [search, setSearch] = useState(() => searchParams.get("q") || "");
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [installing, setInstalling] = useState<string | null>(null);
