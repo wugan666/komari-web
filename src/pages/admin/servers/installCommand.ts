@@ -39,6 +39,8 @@ export function buildInstallCommand(
     }
     return `http://${scriptDomain.replace(/\/+$/, "")}`;
   })();
+  // 控制器自身提供的 Agent 安装包入口（install.sh + 二进制 + 校验），不走 GitHub。
+  const controllerBase = `${host}/download/agent`;
   const args: string[] = ["-e", host, ...identityArgs];
   if (installOptions.disableWebSsh) {
     args.push("--disable-web-ssh");
@@ -138,8 +140,10 @@ export function buildInstallCommand(
   let finalCommand = "";
   switch (selectedPlatform) {
     case "linux":
+      // 从控制器下载 install.sh，并用 KOMARI_DL_BASE 让其直接取控制器的二进制与校验。
       finalCommand =
-        `wget -qO- ${quoteShellArg(scriptUrl)} | sudo bash -s -- ` +
+        `wget -qO- ${quoteShellArg(`${controllerBase}/install.sh`)} | ` +
+        `sudo KOMARI_DL_BASE=${quoteShellArg(controllerBase)} bash -s -- ` +
         quoteShellArgs(args);
       break;
     case "windows":
@@ -155,7 +159,8 @@ export function buildInstallCommand(
       break;
     case "macos":
       finalCommand =
-        `zsh <(curl -sL ${quoteShellArg(scriptUrl)}) ` +
+        `KOMARI_DL_BASE=${quoteShellArg(controllerBase)} ` +
+        `zsh <(curl -sL ${quoteShellArg(`${controllerBase}/install.sh`)}) ` +
         quoteShellArgs(args);
       break;
     case "docker": {
