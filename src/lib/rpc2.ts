@@ -1,3 +1,4 @@
+import { decodeMetricResult } from "./metricWire";
 import type {
   JSONRPC2Request,
   JSONRPC2Response,
@@ -295,7 +296,7 @@ export class RPC2Client {
         throw new Error(`RPC Error ${jsonResponse.error.code}: ${jsonResponse.error.message}`);
       }
 
-      return jsonResponse.result;
+      return decodeMetricResult(jsonResponse.result);
     } catch (error) {
       if (error instanceof Error) {
         throw error;
@@ -340,7 +341,7 @@ export class RPC2Client {
         if ("error" in res) {
           throw new Error(`RPC Error ${res.error.code}: ${res.error.message}`);
         }
-        return res.result;
+        return decodeMetricResult(res.result);
       });
     } catch (error) {
       if (error instanceof Error) {
@@ -484,7 +485,7 @@ export class RPC2Client {
     if ("error" in data) {
       pending.reject(new Error(`RPC Error ${data.error.code}: ${data.error.message}`));
     } else {
-      pending.resolve(data.result);
+      pending.resolve(decodeMetricResult(data.result));
     }
   }
 

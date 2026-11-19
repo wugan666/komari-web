@@ -1,3 +1,4 @@
+import { sanitizeConfigHtml } from "@/utils/safeMarkup";
 import {
   useCallback,
   useEffect,
@@ -371,7 +372,7 @@ const ConfigFormTabs = ({
         <Box
           key={`textbox-${index}`}
           className="km-config-textbox"
-          dangerouslySetInnerHTML={{ __html: title || "" }}
+          dangerouslySetInnerHTML={{ __html: sanitizeConfigHtml(title || "") }}
         />
       );
     }
