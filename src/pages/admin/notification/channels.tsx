@@ -1,5 +1,6 @@
 import React, { useMemo } from "react";
-import { Text } from "@radix-ui/themes";
+import { Callout, Text } from "@radix-ui/themes";
+import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { Skeletonize } from "@/components/ui/skeleton";
@@ -48,6 +49,10 @@ const NotificationSettings = () => {
   const channelsResult = useRouteQuery(notificationChannelsQuery);
   const channels = channelsResult.data ?? NO_CHANNELS;
   const [currentChannel, setCurrentChannel] = React.useState("");
+  const [enabled, setEnabled] = React.useState(false);
+  React.useEffect(() => {
+    setEnabled(Boolean(settings.notification_enabled));
+  }, [settings.notification_enabled]);
   const [configuration, setConfiguration] =
     React.useState<ThemeConfiguration>();
   const [values, setValues] = React.useState<Record<string, any>>({});
@@ -179,6 +184,30 @@ const NotificationSettings = () => {
     <SettingCardsLoading loading={pageLoading}>
     <div className="flex w-full flex-col gap-km-block">
       <SettingCardLabel>{t("settings.notification.title")}</SettingCardLabel>
+      <Callout.Root color="blue" className="km-notification-plugin-hint">
+        <Callout.Text>
+          {t(
+            "settings.notification.plugin_channels_hint",
+            "Telegram, Email, Bark, Gotify and ServerChan channels are provided by plugins. Install and enable one from the plugin market, then pick it under Delivery Method; its settings appear below once selected. Webhook and JavaScript are built in.",
+          )}
+          <Link to="/admin/market/plugins?q=notification" className="ml-2 underline">
+            {t("settings.notification.open_plugin_market", "Open plugin market")}
+          </Link>
+          <Link to="/admin/plugins" className="ml-2 underline">
+            {t("settings.notification.manage_plugins", "Manage plugins")}
+          </Link>
+        </Callout.Text>
+      </Callout.Root>
+      {enabled && (!currentChannel || currentChannel === "none") ? (
+        <Callout.Root color="amber">
+          <Callout.Text>
+            {t(
+              "settings.notification.no_channel_selected",
+              "Notifications are enabled but no delivery channel is selected, so nothing will be sent.",
+            )}
+          </Callout.Text>
+        </Callout.Root>
+      ) : null}
       <SettingCardSwitch
         title={t("settings.notification.enable")}
         description={t("settings.notification.enable_description")}
@@ -188,6 +217,7 @@ const NotificationSettings = () => {
             { notification_enabled: checked },
             t,
           );
+          setEnabled(checked);
         }}
         className="km-page-admin-settings-notification km-setting-card"
       />
@@ -230,12 +260,22 @@ const NotificationSettings = () => {
           animate="animate"
           exit="exit"
         >
-          <Text color="gray">
-            {t(
-              "settings.notification.channel_unavailable",
-              "This notification channel is not currently registered.",
-            )}
-          </Text>
+          <Callout.Root color="red">
+            <Callout.Text>
+              {t("settings.notification.channel_unavailable_named", {
+                channel: currentChannel,
+                defaultValue:
+                  "The selected channel \"{{channel}}\" is not registered, so notifications are not being sent.",
+              })}{" "}
+              {t(
+                "settings.notification.plugin_required_help",
+                "Install and enable the corresponding provider plugin, then reload this page.",
+              )}
+              <Link to={`/admin/market/plugins?q=${encodeURIComponent(currentChannel)}`} className="ml-2 underline">
+                {t("settings.notification.open_plugin_market", "Open plugin market")}
+              </Link>
+            </Callout.Text>
+          </Callout.Root>
         </motion.div>
       ) : null}
       </AnimatePresence>

@@ -1,3 +1,4 @@
+import { useSearchParams } from "react-router-dom";
 import { useCallback, useMemo, useRef, useState } from "react";
 import {
   Callout,
@@ -67,7 +68,8 @@ export default function PluginMarketPage() {
     () => new Map(installedList.map((plugin) => [plugin.short, plugin])),
     [installedList],
   );
-  const [search, setSearch] = useState("");
+  const [searchParams] = useSearchParams();
+  const [search, setSearch] = useState(() => searchParams.get("q") || "");
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [slideDirection, setSlideDirection] = useState(1);
   const reduceMotion = useKmReducedMotion();
