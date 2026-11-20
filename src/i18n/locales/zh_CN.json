@@ -62,7 +62,9 @@
       "memTotal": "总内存",
       "os": "操作系统",
       "updatedAt": "更新时间",
-      "uuid": "UUID"
+      "uuid": "UUID",
+      "startupConfig": "Agent 启动参数",
+      "startupConfigLoad": "读取"
     },
     "nodeEdit": {
       "editInfo": "编辑信息",
@@ -160,7 +162,14 @@
       "agentUpgradeOffline": "节点不在线，无法下发升级",
       "agentUpgradeSummary": "升级到 {{version}}：已下发 {{queued}} 台，不支持远程升级 {{unsupported}} 台，离线/失败 {{failed}} 台",
       "agentConflict": "重复 Agent",
-      "agentConflictHint": "最近 2 分钟内连接被顶替 {{count}} 次（最近来自 {{ip}}）：很可能有多个 Agent 在使用这个节点的 token"
+      "agentConflictHint": "最近 2 分钟内连接被顶替 {{count}} 次（最近来自 {{ip}}）：很可能有多个 Agent 在使用这个节点的 token",
+      "status": "状态",
+      "online": "在线",
+      "offlineFor": "离线 {{duration}}",
+      "neverOnline": "从未上线",
+      "agentUpgrading": "升级中…",
+      "agentUpgradeDone": "{{name}} 已升级到 {{version}}",
+      "agentUpgradeTimeout": "{{name}} 两分钟内没有完成升级（仍是 {{version}}），请查看该节点的 Agent 日志"
     },
     "notification": {
       "expire_enable": "是否启用过期提醒",

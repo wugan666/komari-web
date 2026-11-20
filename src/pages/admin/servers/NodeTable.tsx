@@ -142,6 +142,7 @@ const NodeTable = ({
                 />
               </TableHead>
               <TableHead>{t("admin.nodeTable.name")}</TableHead>
+              <TableHead>{t("admin.nodeTable.status")}</TableHead>
               <TableHead>{t("admin.nodeDetail.ipAddress")}</TableHead>
               <TableHead>{t("admin.nodeDetail.clientVersion")}</TableHead>
               <TableHead>{t("common.group")}</TableHead>
@@ -167,6 +168,8 @@ const NodeTable = ({
                   isSnapshotBackend={isSnapshotBackend}
                   hostedVersion={fleet.hostedVersion}
                   conflict={fleet.conflicts[node.uuid]}
+                  online={fleet.online ? !!fleet.online[node.uuid] : null}
+                  upgrading={node.uuid in fleet.upgrading}
                   upgrade={fleet.upgrade}
                 />
               ))}

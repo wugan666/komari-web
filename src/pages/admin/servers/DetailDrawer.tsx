@@ -1,6 +1,8 @@
 import type { NodeDetail } from "@/contexts/NodeDetailsContext";
 import { Button, IconButton } from "@radix-ui/themes";
 import { Copy } from "lucide-react";
+import { useState } from "react";
+import { getRPC2Client } from "@/contexts/RPC2Context";
 import { useTranslation } from "react-i18next";
 import { useIsMobile } from "@/hooks/use-mobile";
 import {
@@ -25,6 +27,29 @@ export default function DetailDrawer({
 }) {
   const { t } = useTranslation();
   const isMobile = useIsMobile();
+  // Agent 实际生效的启动参数：只在点击时向在线 Agent 查询，凭据不展示
+  const [startupConfig, setStartupConfig] = useState<Record<string, unknown> | null>(null);
+  const [startupError, setStartupError] = useState("");
+  const [startupLoading, setStartupLoading] = useState(false);
+  const loadStartupConfig = async () => {
+    setStartupLoading(true);
+    setStartupError("");
+    try {
+      const config = await getRPC2Client().call<unknown, Record<string, unknown>>(
+        "admin:getAgentStartupConfig",
+        { uuid: node.uuid },
+      );
+      setStartupConfig(config ?? {});
+    } catch (error) {
+      setStartupConfig(null);
+      setStartupError(error instanceof Error ? error.message : String(error));
+    } finally {
+      setStartupLoading(false);
+    }
+  };
+  const startupEntries = Object.entries(startupConfig ?? {})
+    .filter(([, value]) => value !== "" && value !== false && value !== 0 && value !== null)
+    .sort(([a], [b]) => a.localeCompare(b));
 
   return (
     <Drawer
@@ -244,6 +269,32 @@ export default function DetailDrawer({
               </div>
             </div>
           </form>
+          <div className="flex flex-col gap-km-group">
+            <div className="flex items-center justify-between">
+              <span>{t("admin.nodeDetail.startupConfig")}</span>
+              <Button
+                size="1"
+                variant="soft"
+                type="button"
+                disabled={startupLoading}
+                onClick={loadStartupConfig}
+              >
+                {t("admin.nodeDetail.startupConfigLoad")}
+              </Button>
+            </div>
+            {startupError && <span className="text-red-500">{startupError}</span>}
+            {startupConfig && (
+              <div className="bg-muted px-3 py-2 rounded border select-text font-mono text-xs break-all">
+                {startupEntries.length === 0
+                  ? "-"
+                  : startupEntries.map(([key, value]) => (
+                      <div key={key}>
+                        {key}: {/token|key|secret|password/i.test(key) ? "••••••" : String(value)}
+                      </div>
+                    ))}
+              </div>
+            )}
+          </div>
         </div>
         <DrawerFooter>
           <DrawerClose asChild>

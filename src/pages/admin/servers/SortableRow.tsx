@@ -21,6 +21,15 @@ import {
   type AgentFleet,
 } from "./useAgentFleet";
 
+/** 距今多久，取最大的一个单位：45s / 12m / 5h / 3d */
+function formatAgo(date: Date) {
+  const seconds = Math.max(0, Math.floor((Date.now() - date.getTime()) / 1000));
+  if (seconds < 60) return `${seconds}s`;
+  if (seconds < 3600) return `${Math.floor(seconds / 60)}m`;
+  if (seconds < 86400) return `${Math.floor(seconds / 3600)}h`;
+  return `${Math.floor(seconds / 86400)}d`;
+}
+
 const SortableRow = ({
   node,
   isSelected,
@@ -29,6 +38,8 @@ const SortableRow = ({
   isSnapshotBackend,
   hostedVersion,
   conflict,
+  online,
+  upgrading,
   upgrade,
 }: {
   node: NodeDetail;
@@ -38,6 +49,9 @@ const SortableRow = ({
   isSnapshotBackend: boolean;
   hostedVersion: string;
   conflict?: AgentConflict;
+  /** null：在线状态还没取到 */
+  online: boolean | null;
+  upgrading: boolean;
   upgrade: AgentFleet["upgrade"];
 }) => {
   const reduced = useKmReducedMotion();
@@ -61,6 +75,7 @@ const SortableRow = ({
     toast.success(t("copy_success"));
   }
   const outdated = isOutdated(node.version, hostedVersion);
+  const lastSeen = node.last_seen_at ? new Date(node.last_seen_at) : null;
   async function upgradeAgent() {
     const result = await upgrade(node.uuid, node.version);
     if (result === "queued") {
@@ -115,6 +130,17 @@ const SortableRow = ({
         <DetailView node={node} />
       </TableCell>
       <TableCell>
+        {online === null ? null : online ? (
+          <Badge color="green">{t("admin.nodeTable.online")}</Badge>
+        ) : (
+          <Badge color="gray" title={lastSeen ? lastSeen.toLocaleString() : undefined}>
+            {lastSeen
+              ? t("admin.nodeTable.offlineFor", { duration: formatAgo(lastSeen) })
+              : t("admin.nodeTable.neverOnline")}
+          </Badge>
+        )}
+      </TableCell>
+      <TableCell>
         <Flex direction="column">
           {node.ipv4 && (
             <Text size="2" className="flex items-center gap-1">
@@ -150,7 +176,10 @@ const SortableRow = ({
       <TableCell>
         <Flex direction="column" align="start" gap="1">
           <span>{node.version}</span>
-          {outdated && (
+          {outdated && upgrading && (
+            <Badge color="blue">{t("admin.nodeTable.agentUpgrading")}</Badge>
+          )}
+          {outdated && !upgrading && (
             <Badge
               color="amber"
               className="cursor-pointer"

@@ -1,4 +1,4 @@
-import { OWNED_AGENT_REPOSITORY, OWNED_AGENT_VERSION } from "@/utils/ownedSources";
+import { OWNED_AGENT_REPOSITORY } from "@/utils/ownedSources";
 import { quotePowerShellArg, quoteShellArg, quoteShellArgs } from "@/utils/shellQuote";
 import { toast } from "sonner";
 import type { InstallOptionsState } from "./useInstallOptions";
@@ -166,10 +166,10 @@ export function buildInstallCommand(
         ? `touch .komari-auto-discovery.json && ` +
           `docker run -d --name komari-agent --restart=always ` +
           `-v .komari-auto-discovery.json:/app/auto-discovery.json ` +
-          `ghcr.io/${OWNED_AGENT_REPOSITORY}:${OWNED_AGENT_VERSION} ` +
+          `ghcr.io/${OWNED_AGENT_REPOSITORY}:latest ` +
           quoteShellArgs(dockerArgs)
         : `docker run -d --name komari-agent --restart=always ` +
-          `ghcr.io/${OWNED_AGENT_REPOSITORY}:${OWNED_AGENT_VERSION} ` +
+          `ghcr.io/${OWNED_AGENT_REPOSITORY}:latest ` +
           quoteShellArgs(dockerArgs);
       break;
     }

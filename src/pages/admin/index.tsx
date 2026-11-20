@@ -20,7 +20,7 @@ const NodeDetailsPage = () => {
 const Layout = () => {
   const { nodeDetail, error, settings, settingsLoading, pending, isEmpty } =
     useServerList();
-  const fleet = useAgentFleet();
+  const fleet = useAgentFleet(nodeDetail);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedNodes, setSelectedNodes] = useState<string[]>([]);
   const filteredNodes = useMemo(

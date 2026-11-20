@@ -174,7 +174,9 @@
       "memTotal": "總記憶體",
       "os": "作業系統",
       "updatedAt": "更新時間",
-      "uuid": "UUID"
+      "uuid": "UUID",
+      "startupConfig": "Agent 啟動參數",
+      "startupConfigLoad": "讀取"
     },
     "nodeEdit": {
       "editInfo": "編輯資訊",
@@ -272,7 +274,14 @@
       "agentUpgradeOffline": "節點不在線，無法下發升級",
       "agentUpgradeSummary": "升級到 {{version}}：已下發 {{queued}} 台，不支援遠端升級 {{unsupported}} 台，離線/失敗 {{failed}} 台",
       "agentConflict": "重複 Agent",
-      "agentConflictHint": "最近 2 分鐘內連線被頂替 {{count}} 次（最近來自 {{ip}}）：很可能有多個 Agent 在使用這個節點的 token"
+      "agentConflictHint": "最近 2 分鐘內連線被頂替 {{count}} 次（最近來自 {{ip}}）：很可能有多個 Agent 在使用這個節點的 token",
+      "status": "狀態",
+      "online": "在線",
+      "offlineFor": "離線 {{duration}}",
+      "neverOnline": "從未上線",
+      "agentUpgrading": "升級中…",
+      "agentUpgradeDone": "{{name}} 已升級到 {{version}}",
+      "agentUpgradeTimeout": "{{name}} 兩分鐘內沒有完成升級（仍是 {{version}}），請查看該節點的 Agent 日誌"
     },
     "notification": {
       "expire_enable": "是否啟用過期提醒",
