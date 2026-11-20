@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { useNodeDetails } from "@/contexts/NodeDetailsContext";
+import { useNodeDetails, type NodeDetail } from "@/contexts/NodeDetailsContext";
 import { Flex, TextField, Button, Text, Dialog } from "@radix-ui/themes";
-import { Plus } from "lucide-react";
+import { ArrowUpCircle, Plus } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { AnimatePresence, motion } from "motion/react";
@@ -10,6 +10,7 @@ import { AnimatedNumber } from "@/components/motion";
 import PageHeader from "@/components/PageHeader";
 import { addClient } from "./api";
 import AutoDiscoverySection from "./AutoDiscoverySection";
+import { isOutdated, type AgentFleet } from "./useAgentFleet";
 
 const Header = ({
   searchTerm,
@@ -17,18 +18,45 @@ const Header = ({
   selectedNodes,
   settings,
   settingsLoading,
+  nodes,
+  fleet,
 }: {
   searchTerm: string;
   setSearchTerm: (term: string) => void;
   selectedNodes: string[];
   settings: any;
   settingsLoading: boolean;
+  nodes: NodeDetail[];
+  fleet: AgentFleet;
 }) => {
   const { t } = useTranslation();
   const { refresh } = useNodeDetails();
   const [loading, setLoading] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
   const inputRef = React.useRef<HTMLInputElement>(null);
+  const [upgrading, setUpgrading] = useState(false);
+  // 有勾选时只升级勾选的节点，否则升级全部落后的节点
+  const outdatedNodes = nodes.filter(
+    (node) =>
+      isOutdated(node.version, fleet.hostedVersion) &&
+      (selectedNodes.length === 0 || selectedNodes.includes(node.uuid)),
+  );
+  const handleUpgradeAgents = async () => {
+    setUpgrading(true);
+    const results = await Promise.all(
+      outdatedNodes.map((node) => fleet.upgrade(node.uuid, node.version)),
+    );
+    setUpgrading(false);
+    const count = (kind: string) => results.filter((result) => result === kind).length;
+    toast.info(
+      t("admin.nodeTable.agentUpgradeSummary", {
+        version: fleet.hostedVersion,
+        queued: count("queued"),
+        unsupported: count("unsupported"),
+        failed: count("failed"),
+      }),
+    );
+  };
   const handleAddNode = async (name: string | undefined) => {
     setDialogOpen(true);
     setLoading(true);
@@ -77,6 +105,18 @@ const Header = ({
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
+          {outdatedNodes.length > 0 && (
+            <Button
+              variant="soft"
+              color="amber"
+              disabled={upgrading}
+              onClick={handleUpgradeAgents}
+              title={t("admin.nodeTable.agentUpgradeHint", { version: fleet.hostedVersion })}
+            >
+              <ArrowUpCircle size={16} />
+              {t("admin.nodeTable.agentUpgradeAll", { count: outdatedNodes.length })}
+            </Button>
+          )}
           <Dialog.Root open={dialogOpen} onOpenChange={setDialogOpen}>
             <Dialog.Trigger>
               <Button data-guide="add-node" onClick={() => setDialogOpen(true)}>

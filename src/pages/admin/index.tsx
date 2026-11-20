@@ -4,6 +4,7 @@ import { Swap } from "@/components/motion";
 import { Skeletonize } from "@/components/ui/skeleton";
 import { PLACEHOLDER_NODES } from "./servers/placeholderNodes";
 import useServerList from "./servers/useServerList";
+import useAgentFleet from "./servers/useAgentFleet";
 import EmptyNodesGuide from "./servers/EmptyNodesGuide";
 import Header from "./servers/Header";
 import NodeTable from "./servers/NodeTable";
@@ -19,6 +20,7 @@ const NodeDetailsPage = () => {
 const Layout = () => {
   const { nodeDetail, error, settings, settingsLoading, pending, isEmpty } =
     useServerList();
+  const fleet = useAgentFleet();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedNodes, setSelectedNodes] = useState<string[]>([]);
   const filteredNodes = useMemo(
@@ -43,6 +45,8 @@ const Layout = () => {
         selectedNodes={selectedNodes}
         settings={settings}
         settingsLoading={settingsLoading}
+        nodes={filteredNodes}
+        fleet={fleet}
       />
 
       {/*
@@ -62,6 +66,7 @@ const Layout = () => {
               selectedNodes={pending ? [] : selectedNodes}
               setSelectedNodes={setSelectedNodes}
               settings={settings}
+              fleet={fleet}
             />
           </Skeletonize>
         )}

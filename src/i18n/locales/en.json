@@ -264,7 +264,15 @@
       "serviceName_placeholder": "Service name, leave empty to use the default name (komari-agent)",
       "setToLongTerm": "Set to Long term",
       "submit": "submit",
-      "submitting": "wait"
+      "submitting": "wait",
+      "agentUpgradeAll": "Upgrade agents ({{count}})",
+      "agentUpgradeHint": "Upgrade to agent {{version}} hosted by this panel",
+      "agentUpgradeQueued": "Upgrade to {{version}} sent; the agent will restart",
+      "agentUpgradeUnsupported": "This agent is older than {{version}} and cannot be upgraded remotely; it will pick up the update on its own, or re-run the install command",
+      "agentUpgradeOffline": "The node is offline, so the upgrade could not be sent",
+      "agentUpgradeSummary": "Upgrade to {{version}}: sent to {{queued}}, {{unsupported}} cannot be upgraded remotely, {{failed}} offline or failed",
+      "agentConflict": "Duplicate agent",
+      "agentConflictHint": "Its connection was replaced {{count}} times in the last 2 minutes (latest from {{ip}}): more than one agent is probably using this node's token"
     },
     "notification": {
       "expire_enable": "Enable Expiration Reminder",

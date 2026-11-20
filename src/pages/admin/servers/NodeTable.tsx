@@ -10,17 +10,20 @@ import { AnimatePresence } from "motion/react";
 import { reorderClients } from "./api";
 import useIsSnapshotBackend from "./useIsSnapshotBackend";
 import SortableRow from "./SortableRow";
+import type { AgentFleet } from "./useAgentFleet";
 
 const NodeTable = ({
   nodes,
   selectedNodes,
   setSelectedNodes,
   settings,
+  fleet,
 }: {
   nodes: NodeDetail[];
   selectedNodes: string[];
   setSelectedNodes: React.Dispatch<React.SetStateAction<string[]>>;
   settings: any;
+  fleet: AgentFleet;
 }) => {
   const { t } = useTranslation();
   const sensors = useSensors(
@@ -162,6 +165,9 @@ const NodeTable = ({
                   handleSelectNode={handleSelectNode}
                   settings={settings}
                   isSnapshotBackend={isSnapshotBackend}
+                  hostedVersion={fleet.hostedVersion}
+                  conflict={fleet.conflicts[node.uuid]}
+                  upgrade={fleet.upgrade}
                 />
               ))}
               </AnimatePresence>

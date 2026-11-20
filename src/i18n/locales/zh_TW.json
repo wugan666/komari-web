@@ -264,7 +264,15 @@
       "serviceName_placeholder": "服務名稱，為空則使用預設名稱(komari-agent)",
       "setToLongTerm": "設定為長期",
       "submit": "提交",
-      "submitting": "等待"
+      "submitting": "等待",
+      "agentUpgradeAll": "升級 Agent（{{count}}）",
+      "agentUpgradeHint": "升級到主控託管的 Agent {{version}}",
+      "agentUpgradeQueued": "已下發升級到 {{version}}，Agent 將自動重啟",
+      "agentUpgradeUnsupported": "該 Agent 低於 {{version}}，不支援遠端升級；它會透過自動更新升級，或請重新執行安裝命令",
+      "agentUpgradeOffline": "節點不在線，無法下發升級",
+      "agentUpgradeSummary": "升級到 {{version}}：已下發 {{queued}} 台，不支援遠端升級 {{unsupported}} 台，離線/失敗 {{failed}} 台",
+      "agentConflict": "重複 Agent",
+      "agentConflictHint": "最近 2 分鐘內連線被頂替 {{count}} 次（最近來自 {{ip}}）：很可能有多個 Agent 在使用這個節點的 token"
     },
     "notification": {
       "expire_enable": "是否啟用過期提醒",

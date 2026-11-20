@@ -115,28 +115,6 @@ export function buildInstallCommand(
     args.push(rotateVal);
   }
 
-  let scriptFile = "install.sh";
-  if (selectedPlatform === "windows") {
-    scriptFile = "install.ps1";
-  }
-  // Pin the installer script and initial binary to the same owned release;
-  // later self-updates are decided by the owned agent itself.
-  if (!args.includes("--install-version")) {
-    args.push("--install-version", OWNED_AGENT_VERSION);
-  }
-  let scriptUrl = `https://raw.githubusercontent.com/${OWNED_AGENT_REPOSITORY}/refs/tags/${OWNED_AGENT_VERSION}/${scriptFile}`;
-  if (enableGhproxy && ghproxy) {
-    scriptUrl = scriptUrl.slice(8); // 去掉 https://
-    if (ghproxy.endsWith("/")) {
-      scriptUrl = `${ghproxy}${scriptUrl}`;
-    } else {
-      scriptUrl = `${ghproxy}/${scriptUrl}`;
-    }
-    if (!scriptUrl.startsWith("http")) {
-      scriptUrl = `http://${scriptUrl}`;
-    }
-  }
-
   let finalCommand = "";
   switch (selectedPlatform) {
     case "linux":
@@ -149,7 +127,9 @@ export function buildInstallCommand(
     case "windows":
       finalCommand =
         `powershell.exe -NoProfile -ExecutionPolicy Bypass -Command ` +
-        `"iwr ${quotePowerShellArg(scriptUrl)}` +
+        // 不使用 $env:，这样整条指令粘贴到 cmd 或 PowerShell 都不会被外层提前展开。
+        `"[Environment]::SetEnvironmentVariable('KOMARI_DL_BASE',${quotePowerShellArg(controllerBase)});` +
+        ` iwr ${quotePowerShellArg(`${controllerBase}/install.ps1`)}` +
         ` -UseBasicParsing -OutFile 'install.ps1'; &` +
         ` '.\\install.ps1'`;
       args.forEach((arg) => {

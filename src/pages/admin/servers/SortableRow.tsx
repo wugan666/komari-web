@@ -1,6 +1,6 @@
 import { memo } from "react";
 import type { NodeDetail } from "@/contexts/NodeDetailsContext";
-import { Flex, Checkbox, Text, IconButton } from "@radix-ui/themes";
+import { Badge, Flex, Checkbox, Text, IconButton } from "@radix-ui/themes";
 import { Copy, MenuIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useSortable } from "@dnd-kit/sortable";
@@ -14,6 +14,12 @@ import { MOTION_TRANSITION, MOTION_EASE_CSS, MOTION_MS } from "@/lib/motion";
 import { useKmReducedMotion } from "@/components/motion/MotionProvider";
 import ActionButtons from "./ActionButtons";
 import DetailView from "./DetailView";
+import {
+  isOutdated,
+  MIN_REMOTE_UPGRADE_VERSION,
+  type AgentConflict,
+  type AgentFleet,
+} from "./useAgentFleet";
 
 const SortableRow = ({
   node,
@@ -21,12 +27,18 @@ const SortableRow = ({
   handleSelectNode,
   settings,
   isSnapshotBackend,
+  hostedVersion,
+  conflict,
+  upgrade,
 }: {
   node: NodeDetail;
   isSelected: boolean;
   handleSelectNode: (uuid: string, checked: boolean) => void;
   settings: any;
   isSnapshotBackend: boolean;
+  hostedVersion: string;
+  conflict?: AgentConflict;
+  upgrade: AgentFleet["upgrade"];
 }) => {
   const reduced = useKmReducedMotion();
   const { attributes, listeners, setNodeRef, transform, transition } =
@@ -47,6 +59,19 @@ const SortableRow = ({
   function copy(text: string) {
     navigator.clipboard.writeText(text);
     toast.success(t("copy_success"));
+  }
+  const outdated = isOutdated(node.version, hostedVersion);
+  async function upgradeAgent() {
+    const result = await upgrade(node.uuid, node.version);
+    if (result === "queued") {
+      toast.success(t("admin.nodeTable.agentUpgradeQueued", { version: hostedVersion }));
+    } else if (result === "unsupported") {
+      toast.warning(
+        t("admin.nodeTable.agentUpgradeUnsupported", { version: MIN_REMOTE_UPGRADE_VERSION }),
+      );
+    } else {
+      toast.error(t("admin.nodeTable.agentUpgradeOffline"));
+    }
   }
   return (
     // content 层：行增删只做淡入淡出——transform 交给 dnd-kit，避免两边抢同一个属性
@@ -122,7 +147,32 @@ const SortableRow = ({
           )}
         </Flex>
       </TableCell>
-      <TableCell>{node.version}</TableCell>
+      <TableCell>
+        <Flex direction="column" align="start" gap="1">
+          <span>{node.version}</span>
+          {outdated && (
+            <Badge
+              color="amber"
+              className="cursor-pointer"
+              title={t("admin.nodeTable.agentUpgradeHint", { version: hostedVersion })}
+              onClick={upgradeAgent}
+            >
+              ↑ {hostedVersion}
+            </Badge>
+          )}
+          {conflict && (
+            <Badge
+              color="red"
+              title={t("admin.nodeTable.agentConflictHint", {
+                count: conflict.takeovers,
+                ip: conflict.last_ip,
+              })}
+            >
+              {t("admin.nodeTable.agentConflict")}
+            </Badge>
+          )}
+        </Flex>
+      </TableCell>
       <TableCell>
         <Text
           size="2"
